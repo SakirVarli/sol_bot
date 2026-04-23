@@ -1,0 +1,25 @@
+risk:
+  # Per-trade
+  max_trade_size_sol: 0.5         # Hard cap per trade
+  default_trade_size_sol: 0.1     # Default if not overridden
+
+  # Portfolio
+  max_concurrent_positions: 1     # Phase 1: one at a time
+  max_exposure_pct: 20.0          # Max % of balance in any one token
+
+  # Daily limits
+  max_daily_loss_sol: 1.0         # Stop trading for the day if exceeded
+  max_daily_trades: 20            # Stop trading for the day if exceeded
+
+  # Loss streak
+  max_consecutive_losses: 3       # Pause after this many losses in a row
+  cooldown_after_streak_minutes: 30
+
+  # Emergency
+  kill_switch_loss_pct: 50.0      # Emergency halt if balance drops this much
+  kill_switch_enabled: true
+
+  # Behavior
+  no_averaging_down: true
+  no_reentry_after_stop: true     # Don't re-enter a token we stopped out of
+  blacklist_failed_sell: true     # Blacklist tokens where sell tx failed

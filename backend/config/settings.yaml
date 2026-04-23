@@ -1,0 +1,59 @@
+bot:
+  mode: paper              # paper | live
+  log_level: INFO
+  data_dir: data
+
+discovery:
+  # Programs to monitor for new pools
+  raydium_amm_v4: "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8"
+  pumpfun_program: "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P"
+
+  # Quote mints we care about (WSOL, USDC)
+  accepted_quote_mints:
+    - "So11111111111111111111111111111111111111112"   # WSOL
+    - "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v" # USDC
+
+  # How long to watch a candidate before giving up (seconds)
+  watch_window_seconds: 120
+
+  # Max candidates in the pipeline at once
+  max_pipeline_size: 50
+
+filters:
+  # Hard reject thresholds
+  min_liquidity_usd: 10000        # Minimum pool liquidity in USD
+  max_top_holder_pct: 30.0        # Max % held by single wallet (excl. pool)
+  max_slippage_bps: 500           # Max acceptable slippage basis points for our trade size
+  min_swap_count: 5               # Minimum swaps observed before considering entry
+  max_suspicious_score: 50        # Reject if token_score >= this
+
+  # Route check
+  route_check_amount_sol: 0.1     # Amount in SOL to use for route viability check
+
+strategy:
+  active: first_pullback          # first_pullback | breakout | smart_wallet_follow
+
+  first_pullback:
+    watch_window_seconds: 90
+    min_initial_spike_pct: 20.0   # Minimum spike to qualify as "initial burst"
+    max_retrace_pct: 50.0         # Pullback cannot exceed this % of the spike
+    min_volume_usd: 5000          # Volume during watch window
+    min_unique_buyers: 10
+
+execution:
+  default_slippage_bps: 300       # 3% slippage tolerance
+  max_slippage_bps: 800           # Emergency cap
+  priority_fee_lamports: 100000   # 0.0001 SOL priority fee
+  confirmation_timeout_seconds: 30
+  max_retries: 3
+
+position:
+  tp1_pct: 40.0                   # Take profit 1: sell 50% at +40%
+  tp1_sell_fraction: 0.5
+  trailing_stop_pct: 25.0         # Trail remaining by 25% from peak
+  hard_stop_pct: -15.0            # Hard stop loss
+  max_hold_minutes: 10            # Time stop
+
+paper:
+  initial_balance_sol: 10.0
+  trade_size_sol: 0.1

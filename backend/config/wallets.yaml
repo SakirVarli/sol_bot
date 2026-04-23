@@ -1,0 +1,13 @@
+# Smart wallets to track (phase 2+)
+# Only used by smart_wallet_follow strategy
+
+tracked_wallets:
+  # Add addresses of wallets you want to copy
+  # - address: "wallet_pubkey_here"
+  #   label: "alpha_trader_1"
+  #   min_confidence: 0.8
+
+# Wallets to always ignore (known bots, protocols, etc.)
+ignored_wallets:
+  - "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"  # SPL Token program
+  - "11111111111111111111111111111111"               # System program

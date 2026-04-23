@@ -1,0 +1,23 @@
+# RPC configuration
+# Override with environment variables: SOLANA_RPC_HTTP, SOLANA_RPC_WS
+
+primary:
+  http: "https://api.mainnet-beta.solana.com"
+  ws: "wss://api.mainnet-beta.solana.com"
+  rate_limit_per_second: 10
+
+# Optional fast path for execution (phase 3+)
+fast:
+  http: ""
+  ws: ""
+
+# External APIs
+jupiter:
+  quote_url: "https://quote-api.jup.ag/v6/quote"
+  swap_url: "https://quote-api.jup.ag/v6/swap"
+  timeout_seconds: 5
+
+# Timeouts
+rpc_timeout_seconds: 10
+ws_ping_interval_seconds: 20
+ws_reconnect_delay_seconds: 3

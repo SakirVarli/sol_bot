@@ -1,0 +1,21 @@
+# Dev override: hot-reload for both backend and frontend
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  backend:
+    build:
+      context: ./backend
+    volumes:
+      - ./backend:/app/backend   # Live reload Python files
+      - ./data:/app/backend/data
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    # In dev, run Vite dev server directly instead of nginx
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/src:/app/src   # Live reload frontend
