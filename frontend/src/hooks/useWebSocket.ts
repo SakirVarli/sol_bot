@@ -1,15 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createWebSocket } from '../api/client'
-import type { BotState, ClosedTrade, LogEntry, WSMessage } from '../types'
+import type { ClosedTrade, LogEntry, StrategyCatalog, WSMessage, WorkspaceState } from '../types'
 
 const MAX_LOGS = 500
 const RECONNECT_DELAY_MS = 3000
 
 export function useWebSocket() {
   const [connected, setConnected] = useState(false)
-  const [botState, setBotState] = useState<BotState | null>(null)
+  const [workspaceState, setWorkspaceState] = useState<WorkspaceState | null>(null)
   const [logs, setLogs] = useState<LogEntry[]>([])
   const [history, setHistory] = useState<ClosedTrade[]>([])
+  const [catalog, setCatalog] = useState<StrategyCatalog | null>(null)
 
   const wsRef = useRef<WebSocket | null>(null)
   const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -40,7 +41,7 @@ export function useWebSocket() {
               return next.length > MAX_LOGS ? next.slice(next.length - MAX_LOGS) : next
             })
           } else if (msg.type === 'state') {
-            setBotState(msg.data)
+            setWorkspaceState(msg.data)
           } else if (msg.type === 'history') {
             setHistory(msg.data)
           }
@@ -76,5 +77,5 @@ export function useWebSocket() {
     }
   }, [connect])
 
-  return { connected, botState, logs, history }
+  return { connected, workspaceState, setWorkspaceState, logs, history, catalog, setCatalog }
 }

@@ -17,7 +17,7 @@ from typing import Optional
 from loguru import logger
 
 from core.discovery.pool_listener import PoolEvent, PoolListener
-from core.discovery.swap_listener import SwapListener
+from core.discovery.multi_swap_listener import SwapListener
 from core.filters.token_score import FilterPipeline
 from core.models.token import TokenCandidate, TokenState
 from core.utils.ids import event_id

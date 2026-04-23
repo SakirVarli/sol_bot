@@ -1,7 +1,7 @@
-import type { BotState } from '../types'
+import type { WorkspaceState } from '../types'
 
 interface Props {
-  botState: BotState | null
+  workspaceState: WorkspaceState | null
 }
 
 function Stat({
@@ -21,8 +21,8 @@ function Stat({
   )
 }
 
-export function StatsPanel({ botState }: Props) {
-  const stats = botState?.stats ?? {
+export function StatsPanel({ workspaceState }: Props) {
+  const stats = workspaceState?.stats ?? {
     trades: 0,
     win_rate: 0,
     net_pnl_sol: 0,

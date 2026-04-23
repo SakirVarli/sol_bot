@@ -21,20 +21,24 @@ class TradeLog:
         await self._db.execute(
             """
             INSERT OR REPLACE INTO positions
-                (position_id, mint, mode, status, entry_ts, close_ts,
-                 cost_sol, realized_pnl_sol, exit_reason, data, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, unixepoch('now'))
+                (position_id, mint, mode, strategy_id, strategy_name, ledger_type, status, entry_ts, close_ts,
+                 cost_sol, realized_pnl_sol, exit_reason, exit_reason_detail, data, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, unixepoch('now'))
             """,
             (
                 position.position_id,
                 position.mint,
                 position.mode,
+                position.strategy_id,
+                position.strategy_name,
+                position.ledger_type,
                 position.status.value,
                 position.entry_ts,
                 position.close_ts,
                 position.cost_sol,
                 position.realized_pnl_sol,
                 position.exit_reason.value if position.exit_reason else None,
+                position.exit_reason_detail,
                 data_json,
             ),
         )
@@ -75,6 +79,37 @@ class TradeLog:
             "winners": wins,
             "losers": total - wins,
         }
+
+    async def summary_by_strategy(self) -> list[dict]:
+        rows = await self._db.fetchall(
+            """
+            SELECT strategy_id, strategy_name,
+                   COUNT(*) as trades,
+                   SUM(CASE WHEN realized_pnl_sol > 0 THEN 1 ELSE 0 END) as winners,
+                   SUM(CASE WHEN realized_pnl_sol <= 0 THEN 1 ELSE 0 END) as losers,
+                   SUM(realized_pnl_sol) as net_pnl_sol
+            FROM positions
+            WHERE status = 'CLOSED'
+            GROUP BY strategy_id, strategy_name
+            ORDER BY net_pnl_sol DESC
+            """
+        )
+        result = []
+        for row in rows:
+            trades = row["trades"] or 0
+            winners = row["winners"] or 0
+            result.append(
+                {
+                    "strategy_id": row["strategy_id"],
+                    "strategy_name": row["strategy_name"],
+                    "trades": trades,
+                    "winners": winners,
+                    "losers": row["losers"] or 0,
+                    "net_pnl_sol": row["net_pnl_sol"] or 0.0,
+                    "win_rate": winners / trades if trades else 0.0,
+                }
+            )
+        return result
 
     async def per_exit_reason_breakdown(self) -> dict:
         rows = await self._db.fetchall(

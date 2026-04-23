@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { api } from '../api/client'
-import type { BotState } from '../types'
+import type { WorkspaceState } from '../types'
 
 interface Props {
   connected: boolean
-  botState: BotState | null
+  workspaceState: WorkspaceState | null
 }
 
 function fmtUptime(seconds: number): string {
@@ -16,19 +16,19 @@ function fmtUptime(seconds: number): string {
   return `${s}s`
 }
 
-export function Header({ connected, botState }: Props) {
+export function Header({ connected, workspaceState }: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const running = botState?.running ?? false
-  const mode = botState?.mode ?? 'paper'
-  const balance = botState?.balance_sol ?? 0
+  const running = workspaceState?.running ?? false
+  const paperLedger = workspaceState?.portfolio.ledgers.find((ledger) => ledger.mode === 'paper')
+  const liveLedger = workspaceState?.portfolio.ledgers.find((ledger) => ledger.mode === 'live')
 
   async function handleStart() {
     setLoading(true)
     setError(null)
     try {
-      await api.startBot('paper')
+      await api.startWorkspace()
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : String(e))
     } finally {
@@ -40,7 +40,7 @@ export function Header({ connected, botState }: Props) {
     setLoading(true)
     setError(null)
     try {
-      await api.stopBot()
+      await api.stopWorkspace()
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : String(e))
     } finally {
@@ -78,28 +78,20 @@ export function Header({ connected, botState }: Props) {
         </div>
 
         {/* Mode badge */}
-        <span
-          className={`px-2 py-0.5 rounded text-xs font-bold border ${
-            mode === 'live'
-              ? 'border-red-500 text-red-400'
-              : 'border-purple-600 text-purple-400'
-          }`}
-        >
-          {mode.toUpperCase()}
-        </span>
-
-        {/* Balance */}
         <div className="text-gray-300">
-          <span className="text-gray-500 text-xs mr-1">BAL</span>
-          <span className={balance > (botState?.initial_balance_sol ?? 10) ? 'text-green-400' : 'text-gray-300'}>
-            {balance.toFixed(4)} SOL
-          </span>
+          <span className="text-gray-500 text-xs mr-1">PAPER</span>
+          <span>{paperLedger?.balance_sol.toFixed(4) ?? '0.0000'} SOL</span>
+        </div>
+
+        <div className="text-gray-300">
+          <span className="text-gray-500 text-xs mr-1">LIVE</span>
+          <span>{liveLedger?.balance_sol.toFixed(4) ?? '0.0000'} SOL</span>
         </div>
 
         {/* Uptime */}
         {running && (
           <div className="text-gray-500 text-xs">
-            up {fmtUptime(botState?.uptime_seconds ?? 0)}
+            up {fmtUptime(workspaceState?.uptime_seconds ?? 0)}
           </div>
         )}
       </div>

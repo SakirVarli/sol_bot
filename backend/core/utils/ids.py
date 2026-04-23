@@ -23,3 +23,11 @@ def position_id() -> str:
 
 def signal_id() -> str:
     return new_id("sig")
+
+
+def strategy_definition_id() -> str:
+    return new_id("strdef")
+
+
+def strategy_instance_id() -> str:
+    return new_id("str")

@@ -23,6 +23,7 @@ class ExitReason(str, Enum):
     LIQUIDITY_COLLAPSE = "LIQUIDITY_COLLAPSE"
     MANUAL = "MANUAL"
     EMERGENCY = "EMERGENCY"
+    RULE = "RULE"
 
 
 class PartialFill(BaseModel):
@@ -38,6 +39,13 @@ class Position(BaseModel):
     mint: str
     pool_address: Optional[str] = None
     mode: str = "paper"       # paper | live
+    strategy_id: str = ""
+    strategy_name: str = ""
+    ledger_type: str = "paper"
+    rule_version: int = 1
+    entry_reason: str = ""
+    exit_reason_detail: Optional[str] = None
+    allocation_reserved_sol: float = 0.0
 
     # Entry
     entry_ts: float = Field(default_factory=time.time)

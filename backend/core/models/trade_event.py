@@ -21,6 +21,9 @@ class TradeEvent(BaseModel):
     liquidity_usd: Optional[float] = None
     pnl_sol: Optional[float] = None
     pnl_pct: Optional[float] = None
+    strategy_id: Optional[str] = None
+    strategy_name: Optional[str] = None
+    ledger_type: Optional[str] = None
 
 
 # Convenience constructors

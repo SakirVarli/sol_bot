@@ -15,7 +15,11 @@ from loguru import logger
 
 from api.broadcaster import broadcaster
 from api.routes import bot, trades, websocket
-from api.state import app_state
+from api.routes.strategies import router as strategies_router
+from api.routes.workspace import router as workspace_router
+from api.routes.workspace_trades import router as workspace_trades_router
+from api.routes.workspace_websocket import router as workspace_websocket_router
+from api.runtime import runtime_state
 from core.utils.config_loader import load_config
 
 
@@ -23,7 +27,7 @@ from core.utils.config_loader import load_config
 async def lifespan(app: FastAPI):
     # ── Startup ───────────────────────────────────────────────────────────────
     config = load_config(Path(__file__).parent / "config")
-    app_state.config = config
+    runtime_state.config = config
 
     # Configure loguru
     log_level = config.get("bot", {}).get("log_level", "INFO")
@@ -54,8 +58,8 @@ async def lifespan(app: FastAPI):
     # ── Shutdown ──────────────────────────────────────────────────────────────
     logger.info("Shutting down…")
     broadcaster.stop()
-    if app_state.bot_task and not app_state.bot_task.done():
-        app_state.bot_task.cancel()
+    if runtime_state.bot_task and not runtime_state.bot_task.done():
+        runtime_state.bot_task.cancel()
 
 
 app = FastAPI(title="SOL Meme Bot", version="1.0.0", lifespan=lifespan)
@@ -70,6 +74,10 @@ app.add_middleware(
 app.include_router(bot.router, prefix="/api/bot", tags=["bot"])
 app.include_router(trades.router, prefix="/api/trades", tags=["trades"])
 app.include_router(websocket.router, tags=["websocket"])
+app.include_router(workspace_router, prefix="/api/workspace", tags=["workspace"])
+app.include_router(workspace_trades_router, prefix="/api/workspace/trades", tags=["workspace-trades"])
+app.include_router(strategies_router, prefix="/api/strategies", tags=["strategies"])
+app.include_router(workspace_websocket_router, tags=["workspace-websocket"])
 
 
 @app.get("/api/health")

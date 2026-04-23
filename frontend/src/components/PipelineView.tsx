@@ -1,4 +1,4 @@
-import type { BotState, PipelineToken } from '../types'
+import type { PipelineToken, WorkspaceState } from '../types'
 
 function truncateMint(mint: string) {
   return `${mint.slice(0, 6)}…${mint.slice(-4)}`
@@ -28,11 +28,11 @@ function TokenRow({ token }: { token: PipelineToken }) {
 }
 
 interface Props {
-  botState: BotState | null
+  workspaceState: WorkspaceState | null
 }
 
-export function PipelineView({ botState }: Props) {
-  const pipeline = botState?.pipeline ?? { filtering: [], watching: [] }
+export function PipelineView({ workspaceState }: Props) {
+  const pipeline = workspaceState?.pipeline ?? { filtering: [], watching: [] }
   const watching = pipeline.watching ?? []
   const filtering = pipeline.filtering ?? []
   const total = watching.length + filtering.length

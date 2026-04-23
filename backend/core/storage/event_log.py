@@ -40,8 +40,8 @@ class EventLog:
         await self._db.execute(
             """
             INSERT OR REPLACE INTO trade_events
-                (event_id, mint, event_type, ts, position_id, pnl_sol, pnl_pct, data)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                (event_id, mint, event_type, ts, position_id, strategy_id, strategy_name, ledger_type, pnl_sol, pnl_pct, data)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 event.event_id,
@@ -49,6 +49,9 @@ class EventLog:
                 event.event_type,
                 event.ts,
                 event.position_id,
+                event.strategy_id,
+                event.strategy_name,
+                event.ledger_type,
                 event.pnl_sol,
                 event.pnl_pct,
                 data_json,

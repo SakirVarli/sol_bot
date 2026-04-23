@@ -15,25 +15,59 @@ async function apiFetch<T>(path: string, opts?: RequestInit): Promise<T> {
 export const api = {
   health: () => apiFetch<{ status: string }>('/api/health'),
 
-  startBot: (mode: 'paper' | 'live') =>
-    apiFetch('/api/bot/start', {
+  startWorkspace: () => apiFetch('/api/workspace/start', { method: 'POST' }),
+
+  stopWorkspace: () => apiFetch('/api/workspace/stop', { method: 'POST' }),
+
+  getStatus: () => apiFetch('/api/workspace/status'),
+
+  getHistory: (limit = 100) => apiFetch(`/api/workspace/trades/history?limit=${limit}`),
+
+  getConfig: () => apiFetch('/api/workspace/config'),
+
+  getStrategies: () => apiFetch('/api/strategies'),
+
+  saveDefinition: (payload: unknown) =>
+    apiFetch('/api/strategies/definitions', {
       method: 'POST',
-      body: JSON.stringify({ mode }),
+      body: JSON.stringify(payload),
     }),
 
-  stopBot: () => apiFetch('/api/bot/stop', { method: 'POST' }),
+  saveInstance: (payload: unknown) =>
+    apiFetch('/api/strategies/instances', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
 
-  getStatus: () => apiFetch('/api/bot/status'),
+  deleteInstance: (strategyId: string) =>
+    apiFetch(`/api/strategies/instances/${strategyId}`, { method: 'DELETE' }),
 
-  getHistory: (limit = 100) => apiFetch(`/api/trades/history?limit=${limit}`),
+  deleteDefinition: (definitionId: string) =>
+    apiFetch(`/api/strategies/definitions/${definitionId}`, { method: 'DELETE' }),
 
-  getConfig: () => apiFetch('/api/bot/config'),
+  validateDefinition: (payload: unknown) =>
+    apiFetch('/api/strategies/validate', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  previewDefinition: (payload: unknown) =>
+    apiFetch('/api/strategies/preview', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  startStrategy: (strategyId: string) =>
+    apiFetch(`/api/strategies/${strategyId}/start`, { method: 'POST' }),
+
+  stopStrategy: (strategyId: string) =>
+    apiFetch(`/api/strategies/${strategyId}/stop`, { method: 'POST' }),
 }
 
 export function createWebSocket(): WebSocket {
   const wsBase = import.meta.env.VITE_WS_URL ?? ''
   const url = wsBase
-    ? `${wsBase}/ws/stream`
-    : `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/stream`
+    ? `${wsBase}/ws/workspace`
+    : `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/workspace`
   return new WebSocket(url)
 }
